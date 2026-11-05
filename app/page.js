@@ -1,3 +1,4 @@
+
 "use client";
 import { useEffect, useRef, useState } from "react";
 import CloudvilleWelcome from "./CloudvilleWelcome";
@@ -7,12 +8,12 @@ const GROUND = 332, INK = "#1b2a49";
 const MAX_LINE = 8, SLOT0 = 555, SLOT_GAP = 48;
 const HOME_X = 640, MACHINE_X = (i) => 735 + i * 14, LANE_Y = (i) => GROUND - i * 9;
 const BARISTA_SPEED = 220, CUSTOMER_SPEED = 140, BREW = 0.8, PATIENCE = 14;
-const PRICE = 0.1; // $ per barista per simulated hour (1 real second = 1 hour)
+const PRICE = 0.1;
 const SKIN = ["#f1c27d", "#e0ac69", "#c68642", "#8d5524", "#ffdbac"];
 const SHIRT = ["#6c8ef5", "#7bc67b", "#b784e0", "#f5a35c", "#5cc8d6"];
 const SHOUTS = ["Hurry up!", "Too slow!", "Hello?!", "!!"];
 const BCOL = ["#ff6b5b", "#4c8bf5", "#3fb66b", "#a56be0"];
-const LB_PRICE = 0.05; // greeter (load balancer) cost per hour
+const LB_PRICE = 0.05;
 
 const pick = (a) => a[Math.floor(Math.random() * a.length)];
 const fresh = () => ({
@@ -32,8 +33,11 @@ function moveTo(o, tx, ty, dt, speed) {
 }
 
 function newCustomer() {
-  return { x: -30, y: GROUND, face: 1, ph: Math.random() * 6, patience: PATIENCE, skin: pick(SKIN), shirt: pick(SHIRT),
-    claimed: false, arrived: false, assigned: 0, cup: false, mood: "ok", said: "", bubbleT: 0 };
+  return {
+    x: -30, y: GROUND, face: 1, ph: Math.random() * 6, patience: PATIENCE,
+    skin: pick(SKIN), shirt: pick(SHIRT),
+    claimed: false, arrived: false, assigned: 0, cup: false, mood: "ok", said: "", bubbleT: 0
+  };
 }
 
 function leaveAngry(sim, c, line) {
@@ -71,7 +75,7 @@ function update(sim, dt, rate, servers, lb, lesson, wave) {
   if (lesson === 3) {
     // Auto Scaling: hire when lines get long, send people home when it is quiet.
     lb = true;
-    if (wave) rate = 0.25 + ((1 - Math.cos((sim.t * 2 * Math.PI) / 40)) / 2) * 1.5; // rush hour every 40 s
+    if (wave) rate = 0.25 + ((1 - Math.cos((sim.t * 2 * Math.PI) / 40)) / 2) * 1.5;
     const waiting = sim.queue.length;
     sim.cool -= dt;
     sim.busyT = waiting > 2 * sim.target ? sim.busyT + dt : 0;
@@ -87,12 +91,16 @@ function update(sim, dt, rate, servers, lb, lesson, wave) {
   }
   sim.rateNow = rate;
   sim.bill += (servers * PRICE + (lb ? LB_PRICE : 0)) * dt;
-  sim.fixed += (4 * PRICE + LB_PRICE) * dt; // what it would cost to keep 4 baristas all day
+  sim.fixed += (4 * PRICE + LB_PRICE) * dt;
   [...sim.queue, ...sim.leaving, ...sim.baristas, ...sim.exiting].forEach((p) => { p.moving = false; });
 
   while (sim.baristas.length < servers) {
     const i = sim.baristas.length;
-    sim.baristas.push({ x: i === 0 ? HOME_X : W + 30, y: LANE_Y(i), face: -1, ph: 0, st: i === 0 ? "idle" : "arriving", c: null, t: 0, skin: pick(SKIN), cup: false, shirt: BCOL[i], label: "#" + (i + 1) });
+    sim.baristas.push({
+      x: i === 0 ? HOME_X : W + 30, y: LANE_Y(i), face: -1, ph: 0,
+      st: i === 0 ? "idle" : "arriving", c: null, t: 0,
+      skin: pick(SKIN), cup: false, shirt: BCOL[i], label: "#" + (i + 1)
+    });
     if (sim.pendingTrain) { sim.baristas[i].train = true; sim.pendingTrain = false; }
   }
   while (sim.baristas.length > servers) {
@@ -100,7 +108,9 @@ function update(sim, dt, rate, servers, lb, lesson, wave) {
     if (b.c) b.c.claimed = false;
     b.c = null; b.cup = false; b.st = "exiting"; sim.exiting.push(b);
   }
-  sim.exiting = sim.exiting.filter((b) => { b.bubbleT -= dt; moveTo(b, W + 60, b.y, dt, BARISTA_SPEED); return b.x < W + 40; });
+  sim.exiting = sim.exiting.filter((b) => {
+    b.bubbleT -= dt; moveTo(b, W + 60, b.y, dt, BARISTA_SPEED); return b.x < W + 40;
+  });
 
   sim.acc += rate * dt;
   while (sim.acc >= 1) {
@@ -154,7 +164,9 @@ function update(sim, dt, rate, servers, lb, lesson, wave) {
     c.bubbleT -= dt;
     if (c.arrived && !c.claimed) {
       c.patience -= dt;
-      if (c.patience < 5 && c.bubbleT <= 0 && Math.random() < dt * 0.5) { c.said = pick(SHOUTS); c.bubbleT = 1.4; }
+      if (c.patience < 5 && c.bubbleT <= 0 && Math.random() < dt * 0.5) {
+        c.said = pick(SHOUTS); c.bubbleT = 1.4;
+      }
       if (c.patience <= 0) { sim.queue.splice(i, 1); leaveAngry(sim, c, "I'm leaving!"); }
     }
   }
@@ -165,6 +177,7 @@ function update(sim, dt, rate, servers, lb, lesson, wave) {
     return c.x > -50;
   });
 }
+
 function person(ctx, p, kind) {
   const x = p.x, y = p.y, f = p.face || 1;
   const sw = p.moving ? Math.sin(p.ph) * 9 : 0;
@@ -233,17 +246,18 @@ function draw(ctx, sim, lesson) {
   ctx._dots = lesson >= 2;
   ctx.fillStyle = "#dff0ff"; ctx.fillRect(0, 0, W, H);
   cloud(ctx, 60, 50, 1); cloud(ctx, 330, 30, 0.8); cloud(ctx, 470, 70, 0.7);
-  ctx.fillStyle = "#9aa5b5"; ctx.fillRect(0, GROUND, W, H - GROUND);           // street
+  ctx.fillStyle = "#9aa5b5"; ctx.fillRect(0, GROUND, W, H - GROUND);
   ctx.fillStyle = INK; ctx.fillRect(0, GROUND, W, 3);
-  ctx.fillStyle = "#ffe9b0"; ctx.fillRect(590, 150, 210, GROUND - 150);          // shop wall
-  ctx.fillStyle = "#c98c5a"; ctx.fillRect(590, 300, 210, GROUND - 300);          // shop floor
-  ctx.fillStyle = "#ff6b5b"; ctx.fillRect(580, 118, 220, 36);                    // awning
+  ctx.fillStyle = "#ffe9b0"; ctx.fillRect(590, 150, 210, GROUND - 150);
+  ctx.fillStyle = "#c98c5a"; ctx.fillRect(590, 300, 210, GROUND - 300);
+  ctx.fillStyle = "#ff6b5b"; ctx.fillRect(580, 118, 220, 36);
   ctx.fillStyle = "#fff"; for (let x = 590; x < 800; x += 40) ctx.fillRect(x, 118, 20, 36);
   ctx.strokeStyle = INK; ctx.lineWidth = 3; ctx.strokeRect(580, 118, 220, 36);
-  ctx.fillStyle = "#8a6a4a"; ctx.fillRect(700, 296, 100, 6);                     // machine shelf
+  ctx.fillStyle = "#8a6a4a"; ctx.fillRect(700, 296, 100, 6);
   if (lesson === 4) {
     const room = sim.store === "room";
-    ctx.fillStyle = room ? "#d7f3e0" : "#e5e5e5"; ctx.strokeStyle = room ? "#3fb66b" : "#999"; ctx.lineWidth = 3;
+    ctx.fillStyle = room ? "#d7f3e0" : "#e5e5e5";
+    ctx.strokeStyle = room ? "#3fb66b" : "#999"; ctx.lineWidth = 3;
     ctx.beginPath(); ctx.roundRect(600, 172, 92, 62, 8); ctx.fill(); ctx.stroke();
     ctx.fillStyle = INK; ctx.font = "bold 12px sans-serif"; ctx.textAlign = "center";
     ctx.fillText("Storeroom", 646, 192); ctx.fillText(room ? "Recipe book" : "(empty)", 646, 212);
@@ -255,7 +269,7 @@ function draw(ctx, sim, lesson) {
   });
   sim.exiting.forEach((b) => person(ctx, b, "barista"));
   [...sim.baristas].reverse().forEach((b) => person(ctx, b, "barista"));
-  ctx.fillStyle = "#b5651d"; ctx.strokeStyle = INK; ctx.lineWidth = 3;           // counter
+  ctx.fillStyle = "#b5651d"; ctx.strokeStyle = INK; ctx.lineWidth = 3;
   ctx.fillRect(580, 272, 40, GROUND - 272); ctx.strokeRect(580, 272, 40, GROUND - 272);
   ctx.fillStyle = "#d9a066"; ctx.fillRect(576, 266, 48, 10); ctx.strokeRect(576, 266, 48, 10);
   if (lesson >= 2) person(ctx, { ...sim.greeter, y: GROUND - 14 }, "greeter");
@@ -305,7 +319,10 @@ export default function Home() {
   const [slow, setSlow] = useState(false);
   const [store, setStore] = useState("head");
   const [two, setTwo] = useState(false);
-  const [stats, setStats] = useState({ served: 0, lost: 0, bill: 0, waiting: 0, servers: 1, rate: 0.5, saved: 0, training: false, down: "", lag: false, route: "" });
+  const [stats, setStats] = useState({
+    served: 0, lost: 0, bill: 0, waiting: 0, servers: 1, rate: 0.5,
+    saved: 0, training: false, down: "", lag: false, route: ""
+  });
 
   const servers = lesson === 1 ? 1 : lesson === 2 ? hired : lesson === 3 ? stats.servers : lesson === 5 && two ? 4 : 2;
   const autoTraffic = lesson === 3 && wave;
@@ -320,7 +337,9 @@ export default function Home() {
   twoRef.current = two;
 
   const resetAll = () => { simRef.current = fresh(); simBRef.current = fresh(); };
-  const switchLesson = (n) => { setLesson(n); setHired(1); setLb(false); setStore("head"); setTwo(false); resetAll(); };
+  const switchLesson = (n) => {
+    setLesson(n); setHired(1); setLb(false); setStore("head"); setTwo(false); resetAll();
+  };
 
   useEffect(() => {
     const dpr = window.devicePixelRatio || 1;
@@ -345,7 +364,7 @@ export default function Home() {
         A.label = twoNow ? "Café A (Availability Zone A)" : "Your café (one location)";
         B.label = "Café B (Availability Zone B)";
         if (twoNow) {
-          const okA = A.downFor < 2, okB = B.downFor < 2; // the router's health check notices after 2 s
+          const okA = A.downFor < 2, okB = B.downFor < 2;
           if (okA && okB) { rA = rB = rate / 2; }
           else if (okA) { rA = rate; rB = 0; }
           else if (okB) { rA = 0; rB = rate; }
@@ -362,7 +381,9 @@ export default function Home() {
         const sims = twoNow ? [A, B] : [A];
         const sum = (k) => sims.reduce((t, x) => t + x[k], 0);
         setStats({
-          served: sum("served"), lost: sum("lost"), bill: sum("bill"), waiting: sims.reduce((t, x) => t + x.queue.length, 0),
+          served: sum("served"), lost: sum("lost"),
+          bill: sum("bill"),
+          waiting: sims.reduce((t, x) => t + x.queue.length, 0),
           servers: A.target, rate: A.rateNow, saved: A.fixed - A.bill,
           training: A.baristas.some((b) => b.st === "training"),
           down: A.down ? "A" : twoNow && B.down ? "B" : "",
@@ -384,20 +405,20 @@ export default function Home() {
     message = stats.lost > 0 && shownRate > capacity
       ? "Some visitors walked out before the new baristas arrived. Auto Scaling needs a moment to react."
       : shownRate > capacity
-      ? "Traffic is rising and the café is hiring baristas by itself."
-      : "Quiet time. The café sends extra baristas home, so you stop paying for them.";
+        ? "Traffic is rising and the café is hiring baristas by itself."
+        : "Quiet time. The café sends extra baristas home, so you stop paying for them.";
   } else if (lesson === 4) {
     message = stats.training
       ? "The new barista doesn't know the recipes. They were only in the old barista's head, so that line is stuck."
       : store === "room"
-      ? "Recipes live in the storeroom, so any new barista can read them and start right away. Crash a barista to test it."
-      : "Recipes are only in the baristas' heads. Crash a barista and see what happens.";
+        ? "Recipes live in the storeroom, so any new barista can read them and start right away. Crash a barista to test it."
+        : "Recipes are only in the baristas' heads. Crash a barista and see what happens.";
   } else if (lesson === 5) {
     message = !stats.down
       ? two ? "Two locations share the visitors. Cut the power at one of them." : "You have one location. Cut the power and see what happens."
       : !two ? "Your only café lost power, so every visitor is turned away."
-      : stats.lag ? "The router hasn't noticed yet. Some visitors still go to the dark café."
-      : "The router's health check noticed and now sends everyone to the working café.";
+        : stats.lag ? "The router hasn't noticed yet. Some visitors still go to the dark café."
+          : "The router's health check noticed and now sends everyone to the working café.";
   } else if (stats.lost > 0 && rate > capacity) {
     message = lesson === 1
       ? "Visitors are shouting and walking out. One server can't keep up."
@@ -418,7 +439,6 @@ export default function Home() {
       <CloudvilleWelcome
         onSelectLesson={(index) => {
           switchLesson(index + 1);
-
           document.getElementById("learning-lab")?.scrollIntoView({
             behavior: "smooth",
             block: "start",
@@ -427,153 +447,206 @@ export default function Home() {
       />
 
       <main id="learning-lab" className="wrap learning-lab">
-      <header>
-        <h1>Cloudville</h1>
-        <p className="sub">The café is your website. Baristas are servers. Visitors are customers waiting for a page.</p>
-        <div className="tabs" role="tablist">
-          {tabs.map((t, i) => (
-            <button key={t} role="tab" aria-selected={lesson === i + 1} className={lesson === i + 1 ? "active" : ""}
-              onClick={() => switchLesson(i + 1)}>Lesson {i + 1}: {t}</button>
-          ))}
-        </div>
-      </header>
-
-      <canvas ref={canvasRef} className={lesson === 5 ? "cafe short" : "cafe"} role="img"
-        aria-label="Side view of a café: a line of customers waits at the counter while baristas run between the counter and the coffee machines" />
-      <canvas ref={canvasBRef} className="cafe short second" style={{ display: lesson === 5 && two ? "block" : "none" }}
-        role="img" aria-label="Side view of a second café in another location" />
-
-      <p className="message">{message}</p>
-
-      <div className="panel">
-        <label className="slider">
-          {autoTraffic ? "Traffic now (rush hour wave)" : "Traffic"}: <b>{shownRate.toFixed(2)}</b> visitors per second
-          <input type="range" min="0.25" max="2.5" step="0.25" value={shownRate} disabled={autoTraffic}
-            onChange={(e) => setRate(Number(e.target.value))} />
-        </label>
-        <div className="row">
-          {lesson === 2 && (
-            <>
-              <button onClick={() => setHired((n) => Math.min(4, n + 1))} disabled={hired >= 4}>Hire a barista</button>
-              <button onClick={() => setHired((n) => Math.max(1, n - 1))} disabled={hired <= 1}>Send one home</button>
-              <button className={lb ? "on" : ""} aria-pressed={lb} onClick={() => setLb((v) => !v)}>Greeter: {lb ? "on" : "off"}</button>
-            </>
-          )}
-          {lesson === 3 && (
-            <button className={wave ? "on" : ""} aria-pressed={wave} onClick={() => setWave((v) => !v)}>Rush hour wave: {wave ? "on" : "off"}</button>
-          )}
-          {lesson === 4 && (
-            <>
-              <button className={store === "room" ? "on" : ""} aria-pressed={store === "room"}
-                onClick={() => setStore((v) => (v === "room" ? "head" : "room"))}>
-                Recipes kept in: {store === "room" ? "the storeroom" : "the baristas' heads"}
+        <header>
+          <h1>Cloudville</h1>
+          <p className="sub">The café is your website. Baristas are servers. Visitors are customers waiting for a page.</p>
+          <div className="tabs" role="tablist">
+            {tabs.map((t, i) => (
+              <button key={t} role="tab" aria-selected={lesson === i + 1}
+                className={lesson === i + 1 ? "active" : ""}
+                onClick={() => switchLesson(i + 1)}>
+                Lesson {i + 1}: {t}
               </button>
-              <button onClick={() => { simRef.current.crash = true; }}>Crash barista #2</button>
-            </>
-          )}
-          {lesson === 5 && (
-            <>
-              <button className={two ? "on" : ""} aria-pressed={two} onClick={() => { setTwo((v) => !v); resetAll(); }}>
-                Locations: {two ? "two, with a router" : "one"}
-              </button>
-              <button onClick={() => cut(simRef.current)}>Cut power at Café A</button>
-              {two && <button onClick={() => cut(simBRef.current)}>Cut power at Café B</button>}
-            </>
-          )}
-          <button onClick={() => setSlow((s) => !s)}>{slow ? "Normal speed" : "Slow motion"}</button>
-          <button className="reset" onClick={resetAll}>Reset café</button>
-        </div>
-        {stats.route && lesson === 5 && <p className="route">{stats.route}</p>}
-        <div className="stats">
-          <p><b>{servers}</b> {servers === 1 ? "server" : "servers"}</p>
-          <p><b>{stats.waiting}</b> waiting</p>
-          <p><b>{stats.served}</b> served</p>
-          <p className={stats.lost ? "bad" : ""}><b>{stats.lost}</b> walked out</p>
-          <p><b>${stats.bill.toFixed(2)}</b> bill so far</p>
-          {lesson === 3 && <p className="good"><b>${Math.max(0, stats.saved).toFixed(2)}</b> saved vs. always 4 baristas</p>}
-        </div>
-        <small>
-          Each barista serves about 0.5 visitors per second and costs ${PRICE.toFixed(2)} per hour.
-          {lesson >= 2 && ` The greeter costs $${LB_PRICE.toFixed(2)} per hour.`}
-          {lesson === 3 && " Auto Scaling keeps 1 to 4 baristas: it hires when each barista has more than 2 people waiting, and sends one home after a few quiet seconds."}
-          {lesson >= 4 && " Each café has 2 baristas."}
-          {" "}1 second here = 1 hour.
-        </small>
-      </div>
+            ))}
+          </div>
+        </header>
 
-      {lesson === 1 && (
-        <section className="reveal">
-          <h2>In AWS, this is called…</h2>
-          <p>
-            Baristas are <b>EC2 instances</b>, servers you rent by the hour. Visitors are requests.
-            When requests arrive faster than one server can handle, the site slows down and then fails.
-          </p>
-        </section>
-      )}
-      {lesson === 2 && (
-        <section className="reveal">
-          <h2>Try this</h2>
-          <p>
-            Set traffic to 1.5, hire three baristas, and leave the greeter off. Only barista #1 works while the
-            others stand idle. Now turn the greeter on: each visitor gets a coloured dot and goes to the barista
-            with the shortest line.
-          </p>
-          <h2>In AWS, this is called…</h2>
-          <p>
-            Hiring more baristas is <b>scaling out</b> (adding EC2 instances). The greeter is an
-            <b> Elastic Load Balancer (ELB)</b>, which spreads requests across your servers. It also costs money,
-            and it only helps when you have more than one server.
-          </p>
-        </section>
-      )}
-      {lesson === 3 && (
-        <section className="reveal">
-          <h2>Try this</h2>
-          <p>
-            Watch one full rush hour, about 40 seconds. Traffic climbs, the café hires baristas by itself, and when
-            traffic drops it sends them home. Compare your bill with the "always 4 baristas" cost. Then turn the wave off
-            and push the slider yourself to test it.
-          </p>
-          <h2>In AWS, this is called…</h2>
-          <p>
-            This is an <b>EC2 Auto Scaling group</b>. You set a minimum (1) and a maximum (4) and a rule, such as
-            "add a server when the line gets long". Because you pay only for servers that are running, auto scaling
-            keeps you fast during rushes and cheap when it's quiet.
-          </p>
-        </section>
-      )}
-      {lesson === 4 && (
-        <section className="reveal">
-          <h2>Try this</h2>
-          <p>
-            With recipes in the baristas' heads, crash barista #2. The replacement arrives but can't make anything for
-            8 seconds, and that line is stuck. Now keep the recipes in the storeroom and crash again: the replacement
-            starts right away.
-          </p>
-          <h2>In AWS, this is called…</h2>
-          <p>
-            The storeroom is your data store: <b>Amazon S3</b> for files, or a database such as <b>RDS</b> or
-            <b> DynamoDB</b>. Servers should be disposable, so keep your data outside them. That is why Auto Scaling from
-            Lesson 3 can add and remove servers safely.
-          </p>
-        </section>
-      )}
-      {lesson === 5 && (
-        <section className="reveal">
-          <h2>Try this</h2>
-          <p>
-            With one location, cut the power and watch every visitor get turned away. Then switch to two locations and
-            cut the power at Café A. For about 2 seconds the router still sends visitors there, then it notices and
-            sends everyone to Café B.
-          </p>
-          <h2>In AWS, this is called…</h2>
-          <p>
-            Each café is an <b>Availability Zone</b>, a separate data centre. A group of zones in one area is a
-            <b> Region</b>. A load balancer with <b>health checks</b> sends traffic only to healthy zones. Spreading across
-            zones is called <b>high availability</b>, and it costs more because you run twice the servers.
-          </p>
-        </section>
-      )}
+        {/* Cloudville lesson navigation */}
+        <nav className="lesson-navigation" aria-label="Lesson navigation">
+          <button
+            type="button"
+            className="back-home"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          >
+            ← Back to Cloudville
+          </button>
+
+          <div className="lesson-progress">
+            <p>Lesson {lesson} of {tabs.length}</p>
+            <div
+              className="progress-track"
+              role="progressbar"
+              aria-valuenow={lesson}
+              aria-valuemin={1}
+              aria-valuemax={tabs.length}
+              aria-label={`Lesson ${lesson} of ${tabs.length}`}
+            >
+              <div
+                className="progress-fill"
+                style={{ width: `${(lesson / tabs.length) * 100}%` }}
+              />
+            </div>
+          </div>
+
+          <div className="lesson-arrows">
+            <button type="button" onClick={() => switchLesson(lesson - 1)} disabled={lesson === 1}>
+              ← Previous
+            </button>
+            <button type="button" onClick={() => switchLesson(lesson + 1)} disabled={lesson === tabs.length}>
+              Next →
+            </button>
+          </div>
+        </nav>
+
+        <canvas ref={canvasRef} className={lesson === 5 ? "cafe short" : "cafe"}
+          role="img"
+          aria-label="Side view of a café: a line of customers waits at the counter while baristas run between the counter and the coffee machines" />
+        <canvas ref={canvasBRef} className="cafe short second"
+          style={{ display: lesson === 5 && two ? "block" : "none" }}
+          role="img" aria-label="Side view of a second café in another location" />
+
+        <p className="message">{message}</p>
+
+        <div className="panel">
+          <label className="slider">
+            {autoTraffic ? "Traffic now (rush hour wave)" : "Traffic"}: <b>{shownRate.toFixed(2)}</b> visitors per second
+            <input type="range" min="0.25" max="2.5" step="0.25" value={shownRate}
+              disabled={autoTraffic} onChange={(e) => setRate(Number(e.target.value))} />
+          </label>
+
+          <div className="row">
+            {lesson === 2 && (
+              <>
+                <button onClick={() => setHired((n) => Math.min(4, n + 1))} disabled={hired >= 4}>Hire a barista</button>
+                <button onClick={() => setHired((n) => Math.max(1, n - 1))} disabled={hired <= 1}>Send one home</button>
+                <button className={lb ? "on" : ""} aria-pressed={lb}
+                  onClick={() => setLb((v) => !v)}>Greeter: {lb ? "on" : "off"}</button>
+              </>
+            )}
+            {lesson === 3 && (
+              <button className={wave ? "on" : ""} aria-pressed={wave}
+                onClick={() => setWave((v) => !v)}>Rush hour wave: {wave ? "on" : "off"}</button>
+            )}
+            {lesson === 4 && (
+              <>
+                <button className={store === "room" ? "on" : ""} aria-pressed={store === "room"}
+                  onClick={() => setStore((v) => (v === "room" ? "head" : "room"))}>
+                  Recipes kept in: {store === "room" ? "the storeroom" : "the baristas' heads"}
+                </button>
+                <button onClick={() => { simRef.current.crash = true; }}>Crash barista #2</button>
+              </>
+            )}
+            {lesson === 5 && (
+              <>
+                <button className={two ? "on" : ""} aria-pressed={two}
+                  onClick={() => { setTwo((v) => !v); resetAll(); }}>
+                  Locations: {two ? "two, with a router" : "one"}
+                </button>
+                <button onClick={() => cut(simRef.current)}>Cut power at Café A</button>
+                {two && <button onClick={() => cut(simBRef.current)}>Cut power at Café B</button>}
+              </>
+            )}
+            <button onClick={() => setSlow((s) => !s)}>{slow ? "Normal speed" : "Slow motion"}</button>
+            <button className="reset" onClick={resetAll}>Reset café</button>
+          </div>
+
+          {stats.route && lesson === 5 && <p className="route">{stats.route}</p>}
+
+          <div className="stats">
+            <p><b>{servers}</b> {servers === 1 ? "server" : "servers"}</p>
+            <p><b>{stats.waiting}</b> waiting</p>
+            <p><b>{stats.served}</b> served</p>
+            <p className={stats.lost ? "bad" : ""}><b>{stats.lost}</b> walked out</p>
+            <p><b>${stats.bill.toFixed(2)}</b> bill so far</p>
+            {lesson === 3 && <p className="good"><b>${Math.max(0, stats.saved).toFixed(2)}</b> saved vs. always 4 baristas</p>}
+          </div>
+
+          <small>
+            Each barista serves about 0.5 visitors per second and costs ${PRICE.toFixed(2)} per hour.
+            {lesson >= 2 && ` The greeter costs $${LB_PRICE.toFixed(2)} per hour.`}
+            {lesson === 3 && " Auto Scaling keeps 1 to 4 baristas: it hires when each barista has more than 2 people waiting, and sends one home after a few quiet seconds."}
+            {lesson >= 4 && " Each café has 2 baristas."}
+            {" "}1 second here = 1 hour.
+          </small>
+        </div>
+
+        {lesson === 1 && (
+          <section className="reveal">
+            <h2>In AWS, this is called…</h2>
+            <p>
+              Baristas are <b>EC2 instances</b>, servers you rent by the hour. Visitors are requests.
+              When requests arrive faster than one server can handle, the site slows down and then fails.
+            </p>
+          </section>
+        )}
+
+        {lesson === 2 && (
+          <section className="reveal">
+            <h2>Try this</h2>
+            <p>
+              Set traffic to 1.5, hire three baristas, and leave the greeter off. Only barista #1 works while the
+              others stand idle. Now turn the greeter on: each visitor gets a coloured dot and goes to the barista
+              with the shortest line.
+            </p>
+            <h2>In AWS, this is called…</h2>
+            <p>
+              Hiring more baristas is <b>scaling out</b> (adding EC2 instances). The greeter is an
+              <b> Elastic Load Balancer (ELB)</b>, which spreads requests across your servers. It also costs money,
+              and it only helps when you have more than one server.
+            </p>
+          </section>
+        )}
+
+        {lesson === 3 && (
+          <section className="reveal">
+            <h2>Try this</h2>
+            <p>
+              Watch one full rush hour, about 40 seconds. Traffic climbs, the café hires baristas by itself, and when
+              traffic drops it sends them home. Compare your bill with the "always 4 baristas" cost. Then turn the wave off
+              and push the slider yourself to test it.
+            </p>
+            <h2>In AWS, this is called…</h2>
+            <p>
+              This is an <b>EC2 Auto Scaling group</b>. You set a minimum (1) and a maximum (4) and a rule, such as
+              "add a server when the line gets long". Because you pay only for servers that are running, auto scaling
+              keeps you fast during rushes and cheap when it's quiet.
+            </p>
+          </section>
+        )}
+
+        {lesson === 4 && (
+          <section className="reveal">
+            <h2>Try this</h2>
+            <p>
+              With recipes in the baristas' heads, crash barista #2. The replacement arrives but can't make anything for
+              8 seconds, and that line is stuck. Now keep the recipes in the storeroom and crash again: the replacement
+              starts right away.
+            </p>
+            <h2>In AWS, this is called…</h2>
+            <p>
+              The storeroom is your data store: <b>Amazon S3</b> for files, or a database such as <b>RDS</b> or
+              <b> DynamoDB</b>. Servers should be disposable, so keep your data outside them. That is why Auto Scaling from
+              Lesson 3 can add and remove servers safely.
+            </p>
+          </section>
+        )}
+
+        {lesson === 5 && (
+          <section className="reveal">
+            <h2>Try this</h2>
+            <p>
+              With one location, cut the power and watch every visitor get turned away. Then switch to two locations and
+              cut the power at Café A. For about 2 seconds the router still sends visitors there, then it notices and
+              sends everyone to Café B.
+            </p>
+            <h2>In AWS, this is called…</h2>
+            <p>
+              Each café is an <b>Availability Zone</b>, a separate data centre. A group of zones in one area is a
+              <b> Region</b>. A load balancer with <b>health checks</b> sends traffic only to healthy zones. Spreading across
+              zones is called <b>high availability</b>, and it costs more because you run twice the servers.
+            </p>
+          </section>
+        )}
       </main>
     </>
   );

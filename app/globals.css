@@ -1,32 +1,171 @@
-:root { --sky: #cfe8ff; --ink: #1b2a49; --butter: #ffd966; --coral: #ff6b5b; --cloud: #fff; }
-* { box-sizing: border-box; }
-body { margin: 0; background: var(--sky); color: var(--ink); line-height: 1.5; }
-.wrap { max-width: 840px; margin: 0 auto; padding: 24px 16px 64px; }
-h1 { font-size: 2.6rem; margin: 0; }
-.sub { margin: 0 0 16px; font-size: 1.1rem; }
-.cafe { width: 100%; height: auto; aspect-ratio: 800 / 400; border: 4px solid var(--ink); border-radius: 24px; background: #dff0ff; display: block; }
-.message { font-size: 1.15rem; font-weight: 500; margin: 16px 0 12px; min-height: 3.2em; }
-.panel { background: var(--cloud); border: 3px solid var(--ink); border-radius: 20px; padding: 16px 20px; display: grid; gap: 14px; }
-.slider { display: grid; gap: 6px; }
-input[type="range"] { width: 100%; accent-color: var(--coral); height: 32px; }
-.row { display: flex; flex-wrap: wrap; gap: 10px; }
-button { font: inherit; background: var(--butter); color: var(--ink); border: 3px solid var(--ink); border-radius: 14px; padding: 8px 16px; cursor: pointer; }
-button:disabled { opacity: .45; cursor: not-allowed; }
-button.reset { background: var(--coral); color: #fff; }
-button:focus-visible, input:focus-visible { outline: 4px solid var(--ink); outline-offset: 3px; }
-.stats { display: flex; flex-wrap: wrap; gap: 8px 24px; }
-.stats p { margin: 0; }
-.bad { color: #c2271a; }
-.reveal { margin-top: 28px; background: var(--cloud); border: 3px dashed var(--ink); border-radius: 20px; padding: 16px 20px; }
-.reveal h2 { margin-top: 0; font-size: 1.3rem; }
-.tabs { display: flex; flex-wrap: wrap; gap: 10px; margin: 4px 0 16px; }
-.tabs button.active { background: var(--ink); color: #fff; }
-button.on { background: #3fb66b; color: #fff; }
-.good { color: #1f7a45; }
-input[type="range"]:disabled { opacity: .5; }
-.cafe.short { aspect-ratio: 800 / 260; }
-.cafe.second { margin-top: 12px; }
-.route { margin: 0; font-weight: 500; }
+:root {
+  --sky: #cfe8ff;
+  --ink: #1b2a49;
+  --butter: #ffd966;
+  --coral: #ff6b5b;
+  --cloud: #fff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--sky);
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.wrap {
+  max-width: 840px;
+  margin: 0 auto;
+  padding: 24px 16px 64px;
+}
+
+h1 {
+  font-size: 2.6rem;
+  margin: 0;
+}
+
+.sub {
+  margin: 0 0 16px;
+  font-size: 1.1rem;
+}
+
+.cafe {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 800 / 400;
+  border: 4px solid var(--ink);
+  border-radius: 24px;
+  background: #dff0ff;
+  display: block;
+}
+
+.message {
+  font-size: 1.15rem;
+  font-weight: 500;
+  margin: 16px 0 12px;
+  min-height: 3.2em;
+}
+
+.panel {
+  background: var(--cloud);
+  border: 3px solid var(--ink);
+  border-radius: 20px;
+  padding: 16px 20px;
+  display: grid;
+  gap: 14px;
+}
+
+.slider {
+  display: grid;
+  gap: 6px;
+}
+
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--coral);
+  height: 32px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+button {
+  font: inherit;
+  background: var(--butter);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  border-radius: 14px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+button.reset {
+  background: var(--coral);
+  color: #fff;
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 4px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+}
+
+.stats p {
+  margin: 0;
+}
+
+.bad {
+  color: #c2271a;
+}
+
+.reveal {
+  margin-top: 28px;
+  background: var(--cloud);
+  border: 3px dashed var(--ink);
+  border-radius: 20px;
+  padding: 16px 20px;
+}
+
+.reveal h2 {
+  margin-top: 0;
+  font-size: 1.3rem;
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 4px 0 16px;
+}
+
+.tabs button.active {
+  background: var(--ink);
+  color: #fff;
+}
+
+button.on {
+  background: #3fb66b;
+  color: #fff;
+}
+
+.good {
+  color: #1f7a45;
+}
+
+input[type="range"]:disabled {
+  opacity: .5;
+}
+
+.cafe.short {
+  aspect-ratio: 800 / 260;
+}
+
+.cafe.second {
+  margin-top: 12px;
+}
+
+.route {
+  margin: 0;
+  font-weight: 500;
+}
 
 /* =================================
    CLOUDVILLE HOMEPAGE
@@ -90,7 +229,7 @@ input[type="range"]:disabled { opacity: .5; }
   color: #4778a8;
 }
 
-.hero-copy > p:not(.beginner-note) {
+.hero-copy>p:not(.beginner-note) {
   max-width: 480px;
   font-size: 1.15rem;
   line-height: 1.8;
@@ -389,3 +528,95 @@ input[type="range"]:disabled { opacity: .5; }
   }
 }
 
+/* =================================
+   CLOUDVILLE LESSON NAVIGATION
+================================= */
+
+.lesson-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin: 22px 0;
+  padding: 18px 20px;
+  background: #ffffff;
+  border: 2px solid #d5e5f5;
+  border-radius: 18px;
+  box-shadow: 0 4px 15px rgba(27, 42, 73, 0.05);
+}
+
+.lesson-navigation button {
+  font: inherit;
+  padding: 10px 16px;
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  background: var(--butter);
+  color: var(--ink);
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.lesson-navigation button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background: #ffe69a;
+}
+
+.lesson-navigation button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.lesson-navigation .back-home {
+  background: #e8f5ff;
+  border-color: #9fc9ed;
+}
+
+.lesson-progress {
+  flex: 1;
+  min-width: 130px;
+  max-width: 230px;
+}
+
+.lesson-progress p {
+  margin: 0 0 8px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.progress-track {
+  height: 9px;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #e8f0fa;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 20px;
+  background: #55a8d9;
+  transition: width 0.3s ease;
+}
+
+.lesson-arrows {
+  display: flex;
+  gap: 8px;
+}
+
+@media (max-width: 600px) {
+  .lesson-navigation {
+    gap: 14px;
+  }
+
+  .lesson-progress {
+    order: 3;
+    flex-basis: 100%;
+    max-width: none;
+  }
+
+  .lesson-arrows {
+    margin-left: auto;
+  }
+}
