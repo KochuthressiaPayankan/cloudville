@@ -433,6 +433,38 @@ export default function Home() {
 
   const cut = (sim) => { sim.down = true; sim.downT = 10; };
   const tabs = ["The lonely server", "More servers and a greeter", "Auto Scaling", "The storeroom", "Two locations"];
+  const lessonDetails = [
+    {
+      objective: "Understand what a cloud server does and why websites need servers.",
+      concept: "Amazon EC2 — virtual servers in the cloud.",
+      challenge: "Increase visitor traffic until your single barista struggles. Observe what happens to the queue.",
+      takeaway: "A server handles requests. Too much traffic can overwhelm a single server."
+    },
+    {
+      objective: "Understand why websites use multiple servers and distribute incoming traffic.",
+      concept: "Elastic Load Balancing — distributing requests across servers.",
+      challenge: "Hire three baristas, leave the greeter off, and then turn the greeter on. Compare the queues.",
+      takeaway: "A load balancer distributes incoming requests across available servers."
+    },
+    {
+      objective: "Understand how cloud infrastructure adjusts to changing demand.",
+      concept: "EC2 Auto Scaling — automatically adding or removing servers.",
+      challenge: "Watch a rush-hour cycle. Notice when servers are added and when they are sent home.",
+      takeaway: "Auto Scaling helps match server capacity to demand."
+    },
+    {
+      objective: "Understand why application data should be stored separately from servers.",
+      concept: "Amazon S3, Amazon RDS and Amazon DynamoDB.",
+      challenge: "Crash a barista with recipes in their head. Then move the recipes to the storeroom and try again.",
+      takeaway: "External storage helps applications retain data even when servers are replaced."
+    },
+    {
+      objective: "Understand how multiple locations help keep applications available.",
+      concept: "AWS Regions, Availability Zones and health checks.",
+      challenge: "Turn on two locations and cut the power at Café A. Observe how the router responds.",
+      takeaway: "Distributing applications across locations can improve availability."
+    }
+  ];
 
   return (
     <>
@@ -497,6 +529,41 @@ export default function Home() {
             </button>
           </div>
         </nav>
+
+        {/* Lesson learning objectives */}
+        <section className="lesson-objectives">
+          <div className="objectives-heading">
+            <span className="objectives-eyebrow">YOUR LEARNING GUIDE</span>
+            <h2>{tabs[lesson - 1]}</h2>
+            <p>{lessonDetails[lesson - 1].objective}</p>
+          </div>
+
+          <div className="objectives-grid">
+            <div className="objective-item">
+              <span className="objective-icon">☁️</span>
+              <div>
+                <h3>AWS concept</h3>
+                <p>{lessonDetails[lesson - 1].concept}</p>
+              </div>
+            </div>
+
+            <div className="objective-item">
+              <span className="objective-icon">🎯</span>
+              <div>
+                <h3>Your challenge</h3>
+                <p>{lessonDetails[lesson - 1].challenge}</p>
+              </div>
+            </div>
+
+            <div className="objective-item">
+              <span className="objective-icon">💡</span>
+              <div>
+                <h3>Key takeaway</h3>
+                <p>{lessonDetails[lesson - 1].takeaway}</p>
+              </div>
+            </div>
+          </div>
+        </section>
 
         <canvas ref={canvasRef} className={lesson === 5 ? "cafe short" : "cafe"}
           role="img"
