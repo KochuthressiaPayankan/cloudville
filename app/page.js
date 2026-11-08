@@ -2,6 +2,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import CloudvilleWelcome from "./CloudvilleWelcome";
+import LessonQuiz from "./LessonQuiz";
 
 const W = 800, H = 400;
 const GROUND = 332, INK = "#1b2a49";
@@ -299,6 +300,7 @@ function draw(ctx, sim, lesson) {
 }
 
 export default function Home() {
+  const lessonTopRef = useRef(null);
   const canvasRef = useRef(null);
   const canvasBRef = useRef(null);
   const simRef = useRef(fresh());
@@ -312,6 +314,18 @@ export default function Home() {
   const storeRef = useRef("head");
   const twoRef = useRef(false);
   const [lesson, setLesson] = useState(1);
+  function goToNextLesson() {
+    if (lesson >= 5) return;
+
+    setLesson((current) => current + 1);
+
+    setTimeout(() => {
+      lessonTopRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }, 100);
+  }
   const [rate, setRate] = useState(0.5);
   const [hired, setHired] = useState(1);
   const [lb, setLb] = useState(false);
@@ -531,7 +545,7 @@ export default function Home() {
         </nav>
 
         {/* Lesson learning objectives */}
-        <section className="lesson-objectives">
+        <section className="lesson-objectives" ref={lessonTopRef}>
           <div className="objectives-heading">
             <span className="objectives-eyebrow">YOUR LEARNING GUIDE</span>
             <h2>{tabs[lesson - 1]}</h2>
@@ -714,6 +728,11 @@ export default function Home() {
             </p>
           </section>
         )}
+        <LessonQuiz
+          key={lesson}
+          lesson={lesson}
+          onNextLesson={goToNextLesson}
+        />
       </main>
     </>
   );
