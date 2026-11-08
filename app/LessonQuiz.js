@@ -24,6 +24,7 @@ const questions = {
             explanation: "Cloud servers provide computing power over the internet."
         }
     ],
+
     2: [
         {
             question: "What does a load balancer do?",
@@ -44,6 +45,7 @@ const questions = {
             explanation: "Elastic Load Balancing automatically distributes incoming traffic."
         }
     ],
+
     3: [
         {
             question: "What is the main purpose of Auto Scaling?",
@@ -64,6 +66,7 @@ const questions = {
             explanation: "Scaling in during quiet periods can reduce the cost of unused capacity."
         }
     ],
+
     4: [
         {
             question: "What is Amazon S3 mainly used for?",
@@ -84,6 +87,7 @@ const questions = {
             explanation: "Amazon RDS makes it easier to set up and operate relational databases."
         }
     ],
+
     5: [
         {
             question: "What is an Availability Zone?",
@@ -106,11 +110,13 @@ const questions = {
     ]
 };
 
-export default function LessonQuiz({ lesson, onNextLesson }) {
+export default function LessonQuiz({ lesson, onNextLesson, onComplete }) {
+
     const [answers, setAnswers] = useState({});
     const [submitted, setSubmitted] = useState(false);
 
     const quiz = questions[lesson] || [];
+    const passScore = Math.ceil(quiz.length * 2 / 3);
 
     const score = quiz.filter(
         (q, index) => answers[index] === q.answer
@@ -125,8 +131,21 @@ export default function LessonQuiz({ lesson, onNextLesson }) {
         }));
     }
 
+    function retryQuiz() {
+        setAnswers({});
+        setSubmitted(false);
+    }
+
+    function submitQuiz() {
+        if (submitted) return;
+
+        setSubmitted(true);
+        if (score >= passScore) onComplete?.(lesson);
+    }
+
     return (
         <section className="lesson-quiz">
+
             <div className="quiz-heading">
                 <span>✦ QUICK KNOWLEDGE CHECK</span>
                 <h2>Test what you learned</h2>
@@ -135,18 +154,25 @@ export default function LessonQuiz({ lesson, onNextLesson }) {
 
             {quiz.map((q, index) => (
                 <div className="quiz-question" key={index}>
+
                     <h3>{index + 1}. {q.question}</h3>
 
                     <div className="quiz-options">
+
                         {q.options.map((option, optionIndex) => {
+
                             const selected = answers[index] === optionIndex;
                             const correct = q.answer === optionIndex;
 
                             let className = "quiz-option";
 
-                            if (submitted && correct) className += " correct";
-                            else if (submitted && selected) className += " incorrect";
-                            else if (selected) className += " selected";
+                            if (submitted && correct) {
+                                className += " correct";
+                            } else if (submitted && selected) {
+                                className += " incorrect";
+                            } else if (selected) {
+                                className += " selected";
+                            }
 
                             return (
                                 <button
@@ -160,6 +186,7 @@ export default function LessonQuiz({ lesson, onNextLesson }) {
                                 </button>
                             );
                         })}
+
                     </div>
 
                     {submitted && (
@@ -168,29 +195,39 @@ export default function LessonQuiz({ lesson, onNextLesson }) {
                             {q.explanation}
                         </p>
                     )}
+
                 </div>
             ))}
 
             {!submitted ? (
+
                 <button
                     type="button"
                     className="quiz-submit"
-                    onClick={() => setSubmitted(true)}
+                    onClick={submitQuiz}
                     disabled={Object.keys(answers).length !== quiz.length}
                 >
                     Check my answers
                 </button>
+
             ) : (
+
                 <div className="quiz-result">
+
                     <h3>You scored {score} / {quiz.length}</h3>
 
                     <p>
-                        {score === quiz.length
-                            ? "Excellent! You've mastered this lesson."
-                            : "Good effort! Review the explanations and keep learning."}
+                        {score >= passScore
+                            ? "Passed! You can continue to the next lesson."
+                            : `You need ${passScore} out of ${quiz.length} to pass. Review the explanations and try again.`}
                     </p>
 
-                    {lesson < 5 ? (
+                    {score < passScore ? (
+                        <button type="button" className="quiz-submit" onClick={retryQuiz}>
+                            Try again ↻
+                        </button>
+                    ) : lesson < 5 ? (
+
                         <button
                             type="button"
                             className="quiz-submit"
@@ -198,11 +235,17 @@ export default function LessonQuiz({ lesson, onNextLesson }) {
                         >
                             Next Lesson →
                         </button>
+
                     ) : (
+
                         <h3>🎉 You've completed Cloudville!</h3>
+
                     )}
+
                 </div>
+
             )}
+
         </section>
     );
 }
